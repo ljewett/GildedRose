@@ -48,8 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GildedRose.cs" />
+    <Compile Include="ItemType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringValue.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
