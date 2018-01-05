@@ -48,7 +48,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GildedRose.cs" />
-    <Compile Include="ItemType.cs" />
+    <Compile Include="ItemHandler\AgedBrieItemHandler.cs" />
+    <Compile Include="ItemHandler\BackstagePassItemHandler.cs" />
+    <Compile Include="ItemHandler\DefaultItemHandler.cs" />
+    <Compile Include="ItemHandler\ItemHandler.cs" />
+    <Compile Include="ItemHandler\ItemHandlerFactory.cs" />
+    <Compile Include="ItemHandler\SulfurasItemHandler.cs" />
+    <Compile Include="Item\Item.cs" />
+    <Compile Include="Item\ItemType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringValue.cs" />

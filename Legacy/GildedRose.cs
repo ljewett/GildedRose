@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Collections.Generic;
 using Npgsql;
 
 namespace Legacy
@@ -7,6 +8,7 @@ namespace Legacy
     public interface IDatabaseConnector
     {
         DataSet GetItems();
+        DataSet SaveItems(DataSet items);
     }
     
     public class DatabaseConnector : IDatabaseConnector
@@ -25,86 +27,61 @@ namespace Legacy
             }
             return items;
         }
+
+        public DataSet SaveItems(DataSet items)
+        {
+            // save to database
+            return new DataSet();
+        }
     }
     
     public class GildedRose
     {
+        private static List<Item> getItems(IDatabaseConnector connector)
+        {
+            List<Item> items = new List<Item>();
+            DataSet rawItems = connector.GetItems();
+            
+            foreach (DataRow row in rawItems.Tables[0].Rows)
+            {
+                items.Add(new Item(row));
+            }
+            return items;
+        }
+
+        private static DataSet createDataSet(List<Item> items)
+        {
+            DataSet dataSetItems = new DataSet();
+            DataTable table = new DataTable("gildedrose");
+            
+            table.Columns.Add(new DataColumn("name", typeof(string)));
+            table.Columns.Add(new DataColumn("sellin", typeof(int)));
+            table.Columns.Add(new DataColumn("quality", typeof(int)));
+            dataSetItems.Tables.Add(table);
+
+            foreach (Item item in items)
+            {
+                dataSetItems.Tables[0].Rows.Add(item.name, item.sellin, item.quality);
+            }
+
+            return dataSetItems;
+        }
+        
         public static void updateQuality(IDatabaseConnector connector = null)
         {
-            DataSet items = connector.GetItems();
-            foreach (DataRow row in items.Tables[0].Rows)
-            {
-                if ((!"Aged Brie".Equals(row[0])) && !"Backstage passes to a TAFKAL80ETC concert".Equals(row[0]))
-                {
-                    if ((int)row[2] > 0)
-                    {
-                        if (!"Sulfuras, Hand of Ragnaros".Equals(row[0]))
-                        {
-                            row[2] = (int)row[2] - 1;
-                        }
-                    }
-                }
-            else
-            {
-                if ((int)row[2] < 50)
-                {
-                    row[2] = (int)row[2] + 1;
+            List<Item> items = getItems(connector);
+            ItemHandlerFactory handlerFactory = new ItemHandlerFactory();
 
-                    if ("Backstage passes to a TAFKAL80ETC concert".Equals(row[0]))
-                    {
-                        if ((int)row[1] < 11)
-                        {
-                            if ((int)row[0] < 50)
-                            {
-                                row[2] = (int)row[2] + 1;
-                            }
-                        }
-
-                        if ((int)row[1] < 6)
-                        {
-                            if ((int)row[2] < 50)
-                            {
-                                row[2] = (int)row[2] + 1;
-                            }
-                        }
-                    }
-                }
+            List<Item> updatedItems = new List<Item>();
+            foreach (Item item in items)
+            {
+                ItemHandler handler = handlerFactory.getItemHandler(item.type);
+                Item newItem = handler.Update(item);
+                updatedItems.Add(newItem);
             }
 
-            if (!"Sulfuras, Hand of Ragnaros".Equals(row[0]))
-            {
-                row[1] = ((int)row[1] - 1);
-            }
-
-            if ((int)row[1] < 0)
-            {
-                if (!"Aged Brie".Equals(row[0]))
-                {
-                    if (!"Backstage passes to a TAFKAL80ETC concert".Equals(row[0]))
-                    {
-                        if ((int)row[2] > 0)
-                        {
-                            if (!"Sulfuras, Hand of Ragnaros".Equals(row[0]))
-                            {
-                                row[2] = ((int)row[2] - 1);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        row[2] = ((int)row[2] - (int)row[2]);
-                    }
-                }
-                else
-                {
-                    if ((int)row[2] < 50)
-                    {
-                        row[2] = ((int)row[2] + 1);
-                    }
-                }
-            }
-
-            }
+            DataSet itemsToSave = createDataSet(updatedItems);
+            connector.SaveItems(itemsToSave);
         }
     }
 }
