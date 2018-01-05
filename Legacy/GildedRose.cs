@@ -1,20 +1,61 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using Npgsql;
 
 namespace Legacy
 {
-    public class GildedRose
+    public class DatabaseConnector
     {
-        public static void updateQuality()
+       /* private String connectionString;
+        private const String defaultConnectionString = "Host=localhost;Username=steveturley;Password=;Database=legacy";
+        
+        public DatabaseConnector(String connectionString = defaultConnectionString)
+        {
+            this.connectionString = connectionString;
+        }
+
+        public DataSet gatherItems()
+        {
+            DataSet items = new DataSet();
+            using (var conn = new NpgsqlConnection(this.connectionString))
+            {
+                conn.Open();
+                NpgsqlDataAdapter adapter = new NpgsqlDataAdapter("SELECT * FROM Items", conn);
+                adapter.Fill(items);
+                conn.Close();
+            }
+            return items;
+        }*/
+
+        public static DataSet GetItems()
         {
             var connString = "Host=localhost;Username=steveturley;Password=;Database=legacy";
+            DataSet items = new DataSet();
 
             using (var conn = new NpgsqlConnection(connString))
             {
                 conn.Open();
                 NpgsqlDataAdapter adapter = new NpgsqlDataAdapter("SELECT * FROM Items", conn);                  
-                DataSet items= new DataSet();
                 adapter.Fill(items);
+                conn.Close();
+            }
+            return items;
+        }
+    }
+    
+    public class GildedRose
+    {
+        
+        public static void updateQuality()
+        {
+//            var connString = "Host=localhost;Username=steveturley;Password=;Database=legacy";
+
+//            using (var conn = new NpgsqlConnection(connString))
+//            {
+//                conn.Open();
+//                NpgsqlDataAdapter adapter = new NpgsqlDataAdapter("SELECT * FROM Items", conn);
+                DataSet items = DatabaseConnector.GetItems();
+//                adapter.Fill(items);
                 foreach (DataRow row in items.Tables[0].Rows)
                 {
                     if ((!"Aged Brie".Equals(row[0])) && !"Backstage passes to a TAFKAL80ETC concert".Equals(row[0]))
@@ -89,7 +130,7 @@ namespace Legacy
 
                 }
             }
-        }
+//        }
     }
 }
 
