@@ -1,10 +1,29 @@
-﻿namespace Legacy
+﻿using System;
+using System.Collections.Generic;
+
+namespace Legacy
 {
     public class ItemHandlerFactory
     {
+        private Dictionary<ItemType, Func<ItemHandler>> map = new Dictionary<ItemType, Func<ItemHandler>>
+            {
+                {ItemType.AgedBrie, () => new AgedBrieItemHandler()},
+                {ItemType.BackstagePasses, () => new BackstagePassItemHandler()},                
+                {ItemType.Sulfuras, () => new SulfurasItemHandler()},
+            }
+            ;
+        
         public ItemHandler getItemHandler(ItemType itemType)
         {
-            ItemHandler outputHandler = null;
+            if (map.ContainsKey(itemType))
+            {
+                var itemHandler = map[itemType]();
+                return itemHandler;
+            }
+            return new DefaultItemHandler();
+
+            
+/*
             if (itemType == ItemType.AgedBrie)
             {
                 outputHandler = new AgedBrieItemHandler();
@@ -17,11 +36,12 @@
             {
                 outputHandler = new SulfurasItemHandler();
             }
-            else if (itemType == ItemType.Normal)
-            {
-                outputHandler = new DefaultItemHandler();
-            }
-            return outputHandler;
+*/
+//            else if (itemType == ItemType.Normal)
+//            {
+//                outputHandler = new DefaultItemHandler();
+//            }
+//            return outputHandler;
         }
     }
 }

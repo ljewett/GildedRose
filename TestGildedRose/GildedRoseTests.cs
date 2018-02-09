@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Collections.Generic;
 using NUnit.Framework;
 using Legacy;
 using Moq;
@@ -21,7 +20,8 @@ namespace TestGildedRose
 
         public Item GetTestItem(int row = 0)
         {
-            return new Item(items.Tables[0].Rows[row]);
+            Item item = new Item(items.Tables[0].Rows[row]);
+            return item;
         }
 
         public void UpdateQuality(int times = 1)
@@ -77,7 +77,7 @@ namespace TestGildedRose
         public void SulfurasNeverDecreases()
         {
             AddTestItem(ItemType.Sulfuras, "10", "80");
-            UpdateQuality();
+            UpdateQuality(2);
             GildedRose.updateQuality(dbMock.Object);
             Item item = GetTestItem();
             
@@ -119,11 +119,7 @@ namespace TestGildedRose
         
         [Test]
         public void BackStagePassesIncreasesNormallyAboveTenSellinDays()
-        {
-            int[] compareTo = {
-                31, 32, 34, 36, 38, 40, 42, 45, 48, 50, 50, 50, 0
-            };
-            
+        {   
             AddTestItem(ItemType.BackstagePasses, "12", "30");
 
             UpdateQuality();
@@ -139,10 +135,6 @@ namespace TestGildedRose
         [Test]
         public void BackStagePassesDoubleIncreasesBelowTenSellinDays()
         {
-            int[] compareTo = {
-                31, 32, 34, 36, 38, 40, 42, 45, 48, 50, 50, 50, 0
-            };
-            
             AddTestItem(ItemType.BackstagePasses, "10", "32");
             UpdateQuality();
             Item item = GetTestItem();

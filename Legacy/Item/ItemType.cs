@@ -4,7 +4,6 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Legacy
 {
-    
     public sealed class ItemType
     {
         private readonly string name;
